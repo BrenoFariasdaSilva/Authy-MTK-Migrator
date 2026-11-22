@@ -75,3 +75,14 @@ The toolkit also accepts compatible **already-extracted** Authy XML, decrypted J
 - **The Authy backup password**, if some records contain encrypted secrets; this is different from the Authy app-lock PIN.
 
 The hardware-dependent workflow is experimental. Merely having a MediaTek chipset does not guarantee that USB acquisition, filesystem extraction, or token recovery will succeed.
+
+## Setup
+
+### Clone the repository
+
+1. Clone the repository with the following command:
+
+   ```bash
+   git clone https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator.git
+   cd Authy-MTK-Migrator
+   ```
