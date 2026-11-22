@@ -52,6 +52,24 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(tokens[0].digits, 7)
         self.assertEqual(tokens[0].secret, base64.b32encode(bytes.fromhex("0102030405060708090a")).decode().rstrip("="))
 
+    def test_password_protected_uses_aegis_kdf(self):
+        from cryptography.hazmat.primitives import hashes, padding
+        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+        from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+        salt, password = "test-salt", "correct horse battery staple"
+        kdf = PBKDF2HMAC(algorithm=hashes.SHA1(), length=32, salt=salt.encode(), iterations=1000)
+        pad = padding.PKCS7(128).padder()
+        padded = pad.update(SEED.encode()) + pad.finalize()
+        encryptor = Cipher(algorithms.AES(kdf.derive(password.encode())), modes.CBC(bytes(16))).encryptor()
+        ciphertext = encryptor.update(padded) + encryptor.finalize()
+        p = self.make_xml([{"name": "example", "accountType": "sample", "digits": 6,
+                            "salt": salt, "encryptedSecret": base64.b64encode(ciphertext).decode()}])
+        self.assertEqual(len(load_authy_xml(p)[1]), 1)
+        tokens, errors = load_authy_xml(p, password)
+        self.assertEqual(errors, [])
+        self.assertEqual(tokens[0].secret, SEED)
+        self.assertEqual(len(load_authy_xml(p, "wrong")[1]), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
