@@ -78,3 +78,8 @@ def _convert_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--acknowledge-secrets", action="store_true", help="Required to create plaintext sensitive exports")
     p.add_argument("--allow-partial", action="store_true", help="Explicitly export valid tokens despite skipped entries")
     p.add_argument("--force", action="store_true", help="Replace existing regular export files (not symlinks)")
+
+
+def _require(flag: bool, message: str) -> None:
+    if not flag:
+        raise MigrationError(message)
