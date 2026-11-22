@@ -62,3 +62,25 @@ def _is_safe_dir(path: Path) -> None:
     path.mkdir(mode=0o700, parents=True, exist_ok=True)
     if os.name != "nt":
         os.chmod(path, 0o700)
+
+
+def _save_bytes(path: Path, content: bytes, overwrite: bool) -> None:
+    """Atomic new-file creation; refuse clobbering any existing file unless requested."""
+    if path.exists() or path.is_symlink():
+        if not overwrite or path.is_symlink() or not path.is_file():
+            raise MigrationError(f"Output exists; use --force to replace a regular file: {path}")
+    fd, tmp = tempfile.mkstemp(prefix=".staging-", dir=str(path.parent))
+    try:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.chmod(tmp, 0o600)
+        if not overwrite and (path.exists() or path.is_symlink()):
+            raise MigrationError(f"Output already exists: {path}")
+        if path.is_symlink():
+            raise MigrationError(f"Refusing symlink output: {path}")
+        os.replace(tmp, path)
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
