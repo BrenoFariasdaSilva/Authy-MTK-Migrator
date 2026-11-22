@@ -110,3 +110,21 @@ The hardware-dependent workflow is experimental. Merely having a MediaTek chipse
       ```  
 
   The prototype's setup script checks for prerequisites and installs MTKClient in a separate virtual environment. No setup script is necessary for converting an already-extracted supported file once Python dependencies are installed. **The `Makefile` and setup script are not yet available in the current GitHub checkout.**
+
+## Run Programing Language Code:
+
+```bash
+# After installing the standalone prototype:
+python -m android_mtk doctor
+python -m android_mtk --help
+```
+
+### Dependencies
+
+1. Install the prototype's Python dependencies (after `requirements.txt` has been committed) with the following command:
+
+   ```bash
+   python -m pip install -r requirements.txt
+   ```
+
+   The reference prototype pins `cryptography`, `Pillow`, and `qrcode`. Hardware acquisition also requires MTKClient and its separately managed dependencies.
