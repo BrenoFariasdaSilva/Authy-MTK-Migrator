@@ -157,6 +157,15 @@ class ParserTests(unittest.TestCase):
                                    "--acknowledge-secrets", "--allow-partial", "--formats", "aegis"]), 0)
         self.assertTrue((out / "aegis.json").is_file())
 
+    def test_ios_json_import(self):
+        p = self.root / "input.json"
+        p.write_text(json.dumps({"decrypted_authenticator_tokens": [{
+            "name": "Alice", "issuer": "Example", "decrypted_seed": SEED, "digits": 6
+        }]}))
+        tokens, errors = load_tokens(p)
+        self.assertEqual(len(tokens), 1)
+        self.assertEqual(errors, [])
+
 
 if __name__ == "__main__":
     unittest.main()
