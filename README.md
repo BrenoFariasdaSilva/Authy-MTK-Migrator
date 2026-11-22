@@ -34,7 +34,7 @@ Project-Description.
 [![Merged PRs](https://img.shields.io/github/issues-search/BrenoFariasdaSilva/Authy-MTK-Migrator?query=is%3Apr%20is%3Amerged&label=merged%20PRs&color=blue)](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/pulls?q=is%3Apr+is%3Amerged)
 ![Purpose](https://img.shields.io/badge/Purpose-Repository%20Template-6f42c1)
 ![Workflow](https://img.shields.io/badge/Workflow-Conventional%20Commits-227c4a)
-![Repobeats Statistics](https://repobeats.axiom.co/api/embed/c36c20e25527ac26cdc37e52e5e2335a58f758c8.svg)
+![Repobeats Statistics](https://repobeats.axiom.co/api/embed/ac647e4939b05c18ec875dbf58df9306d1f697eb.svg)
 
 </div>
 
