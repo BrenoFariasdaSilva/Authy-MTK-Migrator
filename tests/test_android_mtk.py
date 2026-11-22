@@ -83,6 +83,13 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(len(tokens), 1)
         self.assertEqual(len(errors), 1)
 
+    def test_parse_uri_roundtrip_hotp_and_totp(self):
+        tokens = [Token(name="alice+bob@example.com", issuer="Example: Inc", secret=SEED,
+                        digits=8, period=20, algorithm="SHA256"),
+                  Token(name="john", issuer="GitHub", secret=SEED, kind="hotp", counter=44)]
+        for token in tokens:
+            self.assertEqual(parse_uri(to_uri(token)), token)
+
 
 if __name__ == "__main__":
     unittest.main()
