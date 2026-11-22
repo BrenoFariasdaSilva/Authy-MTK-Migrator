@@ -44,3 +44,48 @@ def _decrypt_authy(secret_b64: str, salt: str, password: str) -> str:
         return (unpadder.update(padded) + unpadder.finalize()).decode("utf-8")
     except (ValueError, UnicodeError, TypeError) as exc:
         raise MigrationError("Authy backup password is incorrect, or encrypted entry is malformed") from exc
+
+
+def _authy_record(record: dict, password: str | None) -> Token:
+    # Authy's own 7-digit codes use raw hex seed and a 10-second period.
+    own_token = bool(record.get("secretSeed"))
+    if own_token:
+        try:
+            seed = base64.b32encode(bytes.fromhex(record["secretSeed"])).decode("ascii")
+        except (ValueError, TypeError) as exc:
+            raise MigrationError("Authy-specific token has an invalid hex seed") from exc
+    elif record.get("decryptedSecret"):
+        seed = record["decryptedSecret"]
+    elif record.get("encryptedSecret"):
+        if not password:
+            raise MigrationError("Encrypted entries found: supply Authy backup password when prompted")
+        if not isinstance(record.get("salt"), str):
+            raise MigrationError("Encrypted Authy entry is missing its salt")
+        seed = _decrypt_authy(record["encryptedSecret"], record["salt"], password)
+    else:
+        raise MigrationError("Authy entry contains no usable decrypted or encrypted secret")
+    name = str(record.get("name") or "").strip()
+    original_issuer = str(record.get("originalIssuer") or "").strip()
+    original_name = str(record.get("originalName") or "").strip()
+    account_type = str(record.get("accountType") or "").strip()
+    if own_token:
+        issuer, name = name or account_type or "Authy", ""
+    elif original_issuer:
+        issuer = original_issuer
+        for prefix in (issuer + ":", issuer + " - "):
+            if name.startswith(prefix):
+                name = name[len(prefix):].lstrip()
+                break
+    elif ":" in original_name:
+        issuer = original_name.split(":", 1)[0]
+        name = re.sub(r"^" + re.escape(issuer) + r":\s*", "", name)
+    elif " - " in name:
+        issuer, name = name.split(" - ", 1)
+    else:
+        issuer = account_type.capitalize() or "Authy"
+    try:
+        digits = int(record.get("digits", 7 if own_token else 6))
+    except (TypeError, ValueError) as exc:
+        raise MigrationError("Authy token has an invalid digits field") from exc
+    return Token(name=name, issuer=issuer, secret=seed, digits=digits,
+                 period=10 if own_token else 30)
