@@ -76,6 +76,13 @@ class ParserTests(unittest.TestCase):
         with self.assertRaises(MigrationError):
             load_authy_xml(p)
 
+    def test_malformed_secret_not_imported(self):
+        p = self.make_xml([{"name": "good", "decryptedSecret": SEED, "digits": 6},
+                           {"name": "bad", "decryptedSecret": "!!!!!", "digits": 6}])
+        tokens, errors = load_authy_xml(p)
+        self.assertEqual(len(tokens), 1)
+        self.assertEqual(len(errors), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
