@@ -203,8 +203,6 @@ Magnet\ Links\ from\ URL/*.csv
 **/Input/**
 **/Output/**
 
-!**/requirements.txt
-
 # Ignore committer scripts in any directory or subdirectory
 class_block_functions_committer.py
 functions_committer.py
@@ -237,3 +235,5 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .coverage
+
+!**/requirements.txt
