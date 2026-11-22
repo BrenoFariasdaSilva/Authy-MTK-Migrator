@@ -121,3 +121,14 @@ def _load(path: Path, source: str, allow_partial: bool):
         raise MigrationError("No valid tokens were found")
     print(f"Loaded {len(tokens)} unique token(s). No secrets displayed.")
     return tokens
+
+
+def _do_convert(input_path: Path, source: str, out: Path, formats: set[str], *,
+                acknowledge_secrets: bool, allow_partial: bool, force: bool) -> None:
+    _require(acknowledge_secrets, "Export files contain live 2FA secrets. Add --acknowledge-secrets after reviewing documentation")
+    tokens = _load(input_path, source, allow_partial)
+    paths = write_exports(tokens, out, formats, force=force)
+    print(f"Created {len(paths)} local file(s) in {out}. File contents include live authentication secrets.")
+    for path in paths:
+        print(f"  {path}")
+    print("Import and check codes in the destination app BEFORE removing Authy.")
