@@ -84,3 +84,7 @@ def _save_bytes(path: Path, content: bytes, overwrite: bool) -> None:
     finally:
         if os.path.exists(tmp):
             os.unlink(tmp)
+
+
+def _json(data: dict) -> bytes:
+    return (json.dumps(data, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
