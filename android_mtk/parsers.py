@@ -140,3 +140,36 @@ def load_uris(path: Path) -> tuple[list[Token], list[str]]:
         except MigrationError as exc:
             errors.append(f"Line {index}: {exc}")
     return unique_tokens(tokens), errors
+
+
+def parse_uri(uri: str) -> Token:
+    parsed = urlsplit(uri)
+    if parsed.scheme.lower() != "otpauth" or parsed.netloc.lower() not in {"totp", "hotp"}:
+        raise MigrationError("Expected otpauth://totp or otpauth://hotp URI")
+    raw_label = parsed.path.lstrip("/")
+    label = unquote(raw_label)
+    qs = parse_qs(parsed.query, keep_blank_values=True)
+    def field(name: str, default: str = "") -> str:
+        values = qs.get(name)
+        if values is not None and len(values) != 1:
+            raise MigrationError(f"Duplicate URI parameter: {name}")
+        return values[0] if values else default
+    issuer = field("issuer")
+    name = label
+    if ":" in raw_label:
+        raw_issuer, raw_name = raw_label.split(":", 1)
+        label_issuer, name = unquote(raw_issuer), unquote(raw_name)
+        if issuer and label_issuer != issuer:
+            raise MigrationError("URI label issuer conflicts with issuer parameter")
+        issuer = issuer or label_issuer
+    elif issuer and label.startswith(issuer + ":"):
+        name = label[len(issuer) + 1:]
+    elif not issuer and ":" in label:
+        issuer, name = label.split(":", 1)
+    try:
+        return Token(name=name, issuer=issuer, secret=field("secret"),
+                     digits=int(field("digits", "6")), period=int(field("period", "30")),
+                     algorithm=field("algorithm", "SHA1"), kind=parsed.netloc.lower(),
+                     counter=int(field("counter", "0")))
+    except (ValueError, TypeError) as exc:
+        raise MigrationError("Invalid OTP URI numeric field") from exc
