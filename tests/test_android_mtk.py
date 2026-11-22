@@ -114,6 +114,23 @@ class ParserTests(unittest.TestCase):
         t = Token(name="RFC", issuer="example", secret=base64.b32encode(raw).decode(), digits=8)
         self.assertEqual(calculate_code(t, 59), "94287082")
 
+    def test_exports_roundtrip(self):
+        tokens = [Token(name="user", issuer="Example", secret=SEED, digits=7, period=10)]
+        dest = self.root / "exports"
+        paths = write_exports(tokens, dest, {"uris", "aegis", "proton", "qr"})
+        self.assertEqual(len(paths), 6)
+        self.assertEqual(load_uris(dest / "otpauth.txt")[0], tokens)
+        self.assertEqual(load_json(dest / "aegis.json", "aegis")[0], tokens)
+        self.assertEqual(load_json(dest / "proton_authenticator.json", "proton")[0], tokens)
+        self.assertEqual(len(list((dest / "qr_codes").glob("*.png"))), 1)
+        self.assertIn("Example", (dest / "qr_codes/index.csv").read_text())
+        if os.name != "nt":
+            self.assertEqual((dest / "aegis.json").stat().st_mode & 0o777, 0o600)
+            self.assertEqual(dest.stat().st_mode & 0o777, 0o700)
+        with self.assertRaises(MigrationError):
+            write_exports(tokens, dest, {"uris"})
+        write_exports(tokens, dest, {"uris"}, force=True)
+
 
 if __name__ == "__main__":
     unittest.main()
