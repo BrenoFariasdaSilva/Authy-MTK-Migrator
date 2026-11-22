@@ -94,6 +94,12 @@ class ParserTests(unittest.TestCase):
         with self.assertRaises(MigrationError):
             parse_uri(f"otpauth://totp/Foo:alice?issuer=Bar&secret={SEED}")
 
+    def test_normalize_bad_base32_rejected(self):
+        for value in ("", "not-base32!", "A", "1234567890"):
+            with self.subTest(value=value):
+                with self.assertRaises(MigrationError):
+                    normalize_secret(value)
+
 
 if __name__ == "__main__":
     unittest.main()
