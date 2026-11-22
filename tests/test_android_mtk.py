@@ -196,8 +196,17 @@ pathlib.Path(sys.argv[3]).write_bytes(b'0' * 4096)
         (mtk / "mtk.py").write_text("import pathlib,sys; pathlib.Path(sys.argv[3]).write_bytes(b'0'*4096)")
         image = self.root / "userdata.img"
         import os
-        python_path = os.path.relpath(sys.executable, Path.cwd())
-        self.assertEqual(dump_userdata(mtk, image, python_path), image)
+        # A relative path requires the interpreter and the start directory to
+        # be on the same drive on Windows (e.g. Python on C:, repo on D:).
+        # Change cwd only within this test, and always restore it.
+        original_cwd = Path.cwd()
+        try:
+            os.chdir(Path(sys.executable).parent)
+            python_path = os.path.relpath(sys.executable, Path.cwd())
+            self.assertFalse(Path(python_path).is_absolute())
+            self.assertEqual(dump_userdata(mtk, image, python_path), image)
+        finally:
+            os.chdir(original_cwd)
 
     def test_extract_fake_debugfs(self):
         # Mock the debugfs boundary; real ext4 and device support require hardware testing.
