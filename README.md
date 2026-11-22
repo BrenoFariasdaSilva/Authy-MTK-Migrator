@@ -138,12 +138,12 @@ Discuss the results obtained in the project.
 If you use the Authy-MTK-Migrator in your research, please cite it using the following BibTeX entry:
 
 ```
-@misc{softwareAuthy-MTK-Migrator:2024,
-  title = {Authy-MTK-Migrator: Project-Description},
+@misc{softwareAuthy-MTK-Migrator:2026,
+  title = {Authy-MTK-Migrator: Automated offline Authy token recovery from legacy MediaTek Android devices, with exports to Aegis, Proton Authenticator, OTP URIs, and QR codes.},
   author = {Breno Farias da Silva},
-  year = {2024},
+  year = {2026},
   howpublished = {https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator},
-  note = {Accessed on September 11, 2024}
+  note = {Accessed on November 22, 2026}
 }
 ```
 
