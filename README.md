@@ -1,6 +1,6 @@
 <div align="center">
   
-# [Template-Project.](https://github.com/BrenoFariasdaSilva/Template-Project) <img src="https://github.com/BrenoFariasdaSilva/Template-Project/blob/d4173c3b2249a77b6b1a223b86e801ea2042eddc/.assets/Icons/GitHub%20Colored%20Icon.svg"  width="3%" height="3%">
+# [Authy-MTK-Migrator.](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator) <img src="https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/blob/d4173c3b2249a77b6b1a223b86e801ea2042eddc/.assets/Icons/GitHub%20Colored%20Icon.svg"  width="3%" height="3%">
 
 </div>
 
@@ -16,22 +16,22 @@ Project-Description.
 
 <div align="center">
 
-![GitHub Code Size in Bytes](https://img.shields.io/github/languages/code-size/BrenoFariasdaSilva/Template-Project)
-![GitHub Commits](https://img.shields.io/github/commit-activity/t/BrenoFariasdaSilva/Template-Project/main)
-![GitHub Last Commit](https://img.shields.io/github/last-commit/BrenoFariasdaSilva/Template-Project)
-![GitHub Forks](https://img.shields.io/github/forks/BrenoFariasdaSilva/Template-Project)
-![GitHub Language Count](https://img.shields.io/github/languages/count/BrenoFariasdaSilva/Template-Project)
-![GitHub License](https://img.shields.io/github/license/BrenoFariasdaSilva/Template-Project)
-![GitHub Stars](https://img.shields.io/github/stars/BrenoFariasdaSilva/Template-Project)
-![GitHub Contributors](https://img.shields.io/github/contributors/BrenoFariasdaSilva/Template-Project)
-![GitHub Created At](https://img.shields.io/github/created-at/BrenoFariasdaSilva/Template-Project)
-![wakatime](https://wakatime.com/badge/github/BrenoFariasdaSilva/Template-Project.svg)
-[![Open Issues](https://img.shields.io/github/issues/BrenoFariasdaSilva/Template-Project)](https://github.com/BrenoFariasdaSilva/Template-Project/issues)
-[![Closed Issues](https://img.shields.io/github/issues-closed/BrenoFariasdaSilva/Template-Project)](https://github.com/BrenoFariasdaSilva/Template-Project/issues?q=is%3Aissue+is%3Aclosed)
-[![Open Pull Requests](https://img.shields.io/github/issues-pr/BrenoFariasdaSilva/Template-Project)](https://github.com/BrenoFariasdaSilva/Template-Project/pulls)
-[![Closed Pull Requests](https://img.shields.io/github/issues-pr-closed/BrenoFariasdaSilva/Template-Project)](https://github.com/BrenoFariasdaSilva/Template-Project/pulls?q=is%3Apr+is%3Aclosed)
-[![Monthly Commits](https://img.shields.io/github/commit-activity/m/BrenoFariasdaSilva/Template-Project/main)](https://github.com/BrenoFariasdaSilva/Template-Project/commits)
-[![Merged PRs](https://img.shields.io/github/issues-search/BrenoFariasdaSilva/Template-Project?query=is%3Apr%20is%3Amerged&label=merged%20PRs&color=blue)](https://github.com/BrenoFariasdaSilva/Template-Project/pulls?q=is%3Apr+is%3Amerged)
+![GitHub Code Size in Bytes](https://img.shields.io/github/languages/code-size/BrenoFariasdaSilva/Authy-MTK-Migrator)
+![GitHub Commits](https://img.shields.io/github/commit-activity/t/BrenoFariasdaSilva/Authy-MTK-Migrator/main)
+![GitHub Last Commit](https://img.shields.io/github/last-commit/BrenoFariasdaSilva/Authy-MTK-Migrator)
+![GitHub Forks](https://img.shields.io/github/forks/BrenoFariasdaSilva/Authy-MTK-Migrator)
+![GitHub Language Count](https://img.shields.io/github/languages/count/BrenoFariasdaSilva/Authy-MTK-Migrator)
+![GitHub License](https://img.shields.io/github/license/BrenoFariasdaSilva/Authy-MTK-Migrator)
+![GitHub Stars](https://img.shields.io/github/stars/BrenoFariasdaSilva/Authy-MTK-Migrator)
+![GitHub Contributors](https://img.shields.io/github/contributors/BrenoFariasdaSilva/Authy-MTK-Migrator)
+![GitHub Created At](https://img.shields.io/github/created-at/BrenoFariasdaSilva/Authy-MTK-Migrator)
+![wakatime](https://wakatime.com/badge/github/BrenoFariasdaSilva/Authy-MTK-Migrator.svg)
+[![Open Issues](https://img.shields.io/github/issues/BrenoFariasdaSilva/Authy-MTK-Migrator)](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/issues)
+[![Closed Issues](https://img.shields.io/github/issues-closed/BrenoFariasdaSilva/Authy-MTK-Migrator)](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/issues?q=is%3Aissue+is%3Aclosed)
+[![Open Pull Requests](https://img.shields.io/github/issues-pr/BrenoFariasdaSilva/Authy-MTK-Migrator)](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/pulls)
+[![Closed Pull Requests](https://img.shields.io/github/issues-pr-closed/BrenoFariasdaSilva/Authy-MTK-Migrator)](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/pulls?q=is%3Apr+is%3Aclosed)
+[![Monthly Commits](https://img.shields.io/github/commit-activity/m/BrenoFariasdaSilva/Authy-MTK-Migrator/main)](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/commits)
+[![Merged PRs](https://img.shields.io/github/issues-search/BrenoFariasdaSilva/Authy-MTK-Migrator?query=is%3Apr%20is%3Amerged&label=merged%20PRs&color=blue)](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/pulls?q=is%3Apr+is%3Amerged)
 ![Purpose](https://img.shields.io/badge/Purpose-Repository%20Template-6f42c1)
 ![Workflow](https://img.shields.io/badge/Workflow-Conventional%20Commits-227c4a)
 ![Repobeats Statistics](https://repobeats.axiom.co/api/embed/c36c20e25527ac26cdc37e52e5e2335a58f758c8.svg)
@@ -39,7 +39,7 @@ Project-Description.
 </div>
 
 ## Table of Contents
-- [Template-Project. ](#template-project-)
+- [Authy-MTK-Migrator. ](#authy-mtk-migrator-)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Requirements](#requirements)
@@ -74,8 +74,8 @@ Bullet points of the requirements.
 1. Clone the repository with the following command:
 
    ```bash
-   git clone https://github.com/BrenoFariasdaSilva/Template-Project.git
-   cd Template-Project
+   git clone https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator.git
+   cd Authy-MTK-Migrator
    ```
 
 ## Installation:
@@ -115,7 +115,7 @@ Bullet points of the requirements.
 
 ### Dataset - Optional
 
-1. Download the dataset from [WEBSITE-HERE]() and place it in this project directory `(/Template-Project)` and run the following command:
+1. Download the dataset from [WEBSITE-HERE]() and place it in this project directory `(/Authy-MTK-Migrator)` and run the following command:
 
    ```bash
    make dataset
