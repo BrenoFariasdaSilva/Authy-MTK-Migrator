@@ -9,7 +9,9 @@
 ---
 
 Offline recovery and migration of Authy two-factor authentication (2FA) tokens from compatible legacy MediaTek Android devices, with exports to Aegis, Proton Authenticator, `otpauth://` URIs, and QR codes.
-  
+ 
+**Using Authy on an iPhone or iPad?** See [Authy-iOS-MiTM](https://github.com/BrenoFariasdaSilva/Authy-iOS-MiTM) for its separate, mitmproxy-based iOS recovery workflow. The projects have different acquisition methods: this toolkit can import the iOS project's `decrypted_tokens.json` without a MediaTek device, but it does not perform iOS extraction itself.
+
 ---
 
 </div>
