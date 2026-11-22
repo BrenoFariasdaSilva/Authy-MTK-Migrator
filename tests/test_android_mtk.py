@@ -238,5 +238,44 @@ class BackupTests(unittest.TestCase):
             self.assertEqual(restored[0].read_text(), (source / "otpauth.txt").read_text())
 
 
+class PipelineTests(unittest.TestCase):
+    def test_recover_entire_pipeline_with_stubs(self):
+        import sys
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            mtk = root / "mtkclient"
+            mtk.mkdir()
+            # The stub supplies an ext4 signature; this is NOT an actual ext4 image.
+            (mtk / "mtk.py").write_text("""import pathlib,sys
+assert sys.argv[1:3] == ['r', 'userdata']
+data = bytearray(2048)
+data[1080:1082] = b'\\x53\\xef'
+pathlib.Path(sys.argv[3]).write_bytes(data)
+""")
+            source = xml_doc([{"name": "GitHub - alice", "originalIssuer": "GitHub",
+                               "decryptedSecret": SEED, "digits": 6}])
+            def fake_debugfs(cmd, **kwargs):
+                internal = cmd[2].split(" ")[1]
+                if internal.endswith("authenticator.xml"):
+                    Path(cmd[2].split(" ")[-1]).write_text(source)
+                return type("Result", (), {"returncode": 0})()
+            out = root / "authy-recovery"
+            with patch("android_mtk.device._find_debugfs", return_value="debugfs"):
+                real_run = __import__("subprocess").run
+                def dispatch(cmd, **kwargs):
+                    if cmd[0] == "debugfs":
+                        return fake_debugfs(cmd, **kwargs)
+                    return real_run(cmd, **kwargs)
+                with patch("android_mtk.device.subprocess.run", side_effect=dispatch):
+                    with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                        code = main(["recover", "--mtk-dir", str(mtk), "--mtk-python", sys.executable,
+                                     "--out", str(out), "--owned-device", "--acknowledge-secrets",
+                                     "--formats", "aegis,proton,uris"])
+            self.assertEqual(code, 0)
+            self.assertTrue((out / "extracted/com.authy.storage.tokens.authenticator.xml").is_file())
+            self.assertTrue((out / "exports/aegis.json").is_file())
+            self.assertEqual(len(load_json(out / "exports/aegis.json", "aegis")[0]), 1)
+
+
 if __name__ == "__main__":
     unittest.main()
