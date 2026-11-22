@@ -76,3 +76,13 @@ def _find_debugfs(explicit: str | None) -> str:
             if p.is_file():
                 return str(p)
     raise MigrationError("debugfs unavailable; install e2fsprogs (macOS: brew install e2fsprogs)")
+
+
+def _require_ext4(image: Path) -> None:
+    if not image.is_file() or image.is_symlink():
+        raise MigrationError("Userdata image is missing or is not a regular file")
+    with image.open("rb") as stream:
+        stream.seek(1024 + 0x38)
+        magic = stream.read(2)
+    if magic != b"\x53\xef":
+        raise MigrationError("Userdata image is not recognized as an ext2/3/4 filesystem. Encrypted, sparse, F2FS, or unsupported filesystems cannot be processed by debugfs")
