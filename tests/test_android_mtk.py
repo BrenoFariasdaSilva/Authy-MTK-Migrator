@@ -189,6 +189,16 @@ pathlib.Path(sys.argv[3]).write_bytes(b'0' * 4096)
         with self.assertRaises(MigrationError):
             dump_userdata(mtk, image, sys.executable)
 
+    def test_relative_mtk_interpreter_uses_absolute_path(self):
+        import sys
+        mtk = self.root / "mtkclient"
+        mtk.mkdir()
+        (mtk / "mtk.py").write_text("import pathlib,sys; pathlib.Path(sys.argv[3]).write_bytes(b'0'*4096)")
+        image = self.root / "userdata.img"
+        import os
+        python_path = os.path.relpath(sys.executable, Path.cwd())
+        self.assertEqual(dump_userdata(mtk, image, python_path), image)
+
 
 if __name__ == "__main__":
     unittest.main()
