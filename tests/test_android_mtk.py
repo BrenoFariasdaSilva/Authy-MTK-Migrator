@@ -43,6 +43,15 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertEqual((tokens[0].issuer, tokens[0].name, tokens[0].period), ("GitHub", "alice", 30))
 
+    def test_authy_10_second_hex_seed(self):
+        p = self.make_xml([{"name": "Authy", "secretSeed": "0102030405060708090a", "digits": 7}],
+                          "com.authy.storage.tokens.authy.xml", "com.authy.storage.tokens.authy.key")
+        tokens, errors = load_authy_xml(p)
+        self.assertEqual(errors, [])
+        self.assertEqual(tokens[0].period, 10)
+        self.assertEqual(tokens[0].digits, 7)
+        self.assertEqual(tokens[0].secret, base64.b32encode(bytes.fromhex("0102030405060708090a")).decode().rstrip("="))
+
 
 if __name__ == "__main__":
     unittest.main()
