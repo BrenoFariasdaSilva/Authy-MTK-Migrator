@@ -132,3 +132,67 @@ def _do_convert(input_path: Path, source: str, out: Path, formats: set[str], *,
     for path in paths:
         print(f"  {path}")
     print("Import and check codes in the destination app BEFORE removing Authy.")
+
+
+def main(argv: list[str] | None = None) -> int:
+    os.umask(0o077)
+    args = _parser().parse_args(argv)
+    try:
+        if args.command == "doctor":
+            _doctor()
+        elif args.command == "dump":
+            _require(args.owned_device, "Read-only device dumping requires --owned-device")
+            image = dump_userdata(args.mtk_dir, args.image, args.mtk_python)
+            print(f"Read-only userdata dump created: {image}. Contains personal data: keep private.")
+        elif args.command == "extract":
+            paths = extract_authy_xml(args.image, args.out, args.debugfs)
+            print(f"Extracted {len(paths)} Authy XML file(s) to {args.out} (sensitive).")
+        elif args.command == "convert":
+            _do_convert(args.input, args.source, args.out, args.formats,
+                        acknowledge_secrets=args.acknowledge_secrets, allow_partial=args.allow_partial,
+                        force=args.force)
+        elif args.command == "recover":
+            _require(args.owned_device or args.reuse_image, "Add --owned-device for MTKClient acquisition")
+            _require(args.acknowledge_secrets, "Add --acknowledge-secrets for plaintext exports")
+            root = args.out.absolute()
+            if root.is_symlink() or (root.exists() and not root.is_dir()):
+                raise MigrationError("Unsafe recovery directory")
+            root.mkdir(mode=0o700, parents=True, exist_ok=True)
+            if os.name != "nt": os.chmod(root, 0o700)
+            image = root / "userdata.img"
+            if args.reuse_image:
+                _require(image.is_file() and not image.is_symlink(), "--reuse-image requested but userdata.img does not exist")
+            else:
+                dump_userdata(args.mtk_dir, image, args.mtk_python)
+            extracted = root / "extracted"
+            extract_authy_xml(image, extracted, args.debugfs)
+            _do_convert(extracted, "xml", root / "exports", args.formats,
+                        acknowledge_secrets=True, allow_partial=args.allow_partial, force=args.force)
+        elif args.command == "backup":
+            _require(args.input.is_dir() and not args.input.is_symlink(), "Input must be an exports directory")
+            files = sorted(p for p in args.input.rglob("*") if p.is_file())
+            _require(bool(files), "No export files to back up")
+            password = getpass("New archive password (minimum 12 characters): ")
+            _require(password == getpass("Confirm archive password: "), "Passwords do not match")
+            create_backup(files, args.input, args.output, password, args.force)
+            print(f"Encrypted offline backup created: {args.output}")
+            print("Original plaintext export files remain in place; manage them separately.")
+        elif args.command == "restore-backup":
+            password = getpass("Archive password: ")
+            files = restore_backup(args.input, args.out, password, args.force)
+            print(f"Restored {len(files)} sensitive files into {args.out}")
+        else:  # verify
+            _require(args.show_code, "Displaying OTP requires --show-code")
+            tokens = _load(args.input, args.source, allow_partial=False)
+            if not 1 <= args.index <= len(tokens):
+                raise MigrationError(f"Index out of range; valid range: 1..{len(tokens)}")
+            token = tokens[args.index - 1]
+            print(f"{token.issuer} / {token.name or '(Authy-specific)'}: {calculate_code(token)}")
+            print("This code is sensitive. Compare it with the original app and destination app.")
+    except (MigrationError, OSError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        print("Cancelled by user. Inspect and securely handle any partial output.", file=sys.stderr)
+        return 130
+    return 0
