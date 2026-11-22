@@ -19,3 +19,10 @@ ANDROID_LOCATIONS = (
     "/data/data/com.authy.authy/shared_prefs",
     "/data/user/0/com.authy.authy/shared_prefs",
 )
+
+
+def _check_output(path: Path) -> None:
+    if path.exists() or path.is_symlink():
+        raise MigrationError(f"Refusing to overwrite or follow existing destination: {path}")
+    if not path.parent.is_dir() or path.parent.is_symlink():
+        raise MigrationError(f"Destination parent is not a safe directory: {path.parent}")
