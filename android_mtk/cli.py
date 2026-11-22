@@ -83,3 +83,21 @@ def _convert_args(p: argparse.ArgumentParser) -> None:
 def _require(flag: bool, message: str) -> None:
     if not flag:
         raise MigrationError(message)
+
+
+def _doctor() -> None:
+    print(f"Platform: {sys.platform}; Python: {sys.version.split()[0]}")
+    for exe in (("git", "brew") if sys.platform == "darwin" else ("git",)):
+        print(f"{exe}: {shutil.which(exe) or 'not found'}")
+    try:
+        print(f"debugfs: {_find_debugfs(None)}")
+    except MigrationError:
+        print("debugfs: not found (needed only for extraction)")
+    for module in ("cryptography", "qrcode", "PIL"):
+        try:
+            __import__(module)
+            print(f"{module}: available")
+        except ImportError:
+            print(f"{module}: not found")
+    mtk = Path(__file__).resolve().parents[1] / ".tools/mtkclient/mtk.py"
+    print(f"MTKClient: {'found' if mtk.exists() else 'not installed'}")
