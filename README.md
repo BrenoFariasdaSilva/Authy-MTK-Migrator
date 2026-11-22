@@ -132,3 +132,30 @@ python -m android_mtk --help
 ### Dataset - Optional
 
 1. **No dataset download is required.** The tool processes an existing Authy XML/JSON/URI file or, on compatible hardware, a locally extracted `userdata` image. No `make dataset` target exists in the prototype. The unit tests use synthetic token records; never publish real 2FA secrets as test fixtures.
+
+## Usage
+
+Once the standalone prototype has been added and installed, you can convert an existing Authy XML file without connecting a device:
+
+```bash
+python -m android_mtk convert \
+  --input ./com.authy.storage.tokens.authenticator.xml \
+  --out ./exports \
+  --formats aegis,proton,uris,qr \
+  --acknowledge-secrets
+```
+
+For an **owned, supported, unencrypted legacy MediaTek device**, the prototype supports an interactive acquisition-to-export workflow:
+
+```bash
+umask 077
+python -m android_mtk recover \
+  --mtk-dir .tools/mtkclient \
+  --mtk-python .tools/mtkclient/.venv/bin/python \
+  --out ./authy-recovery \
+  --owned-device --acknowledge-secrets --formats all
+```
+
+Connect the powered-off device in its **device-specific** BROM/preloader mode when prompted by MTKClient; the key combination is not universal. Other prototype commands include `dump`, `extract`, `verify`, `backup`, and `restore-backup`. The `recover` command does not overwrite raw device images or modify device partitions, and the export step does not import tokens into another app automatically.
+
+**Security:** `userdata.img`, extracted XML, export JSON, OTP URIs, and QR codes may contain live 2FA credentials. Store them locally with restricted access, never publish them, and **verify every account in the destination app before removing Authy**. Authy-specific 7-digit codes with 10-second periods may not work in all other apps. See the [original November 2026 method](https://gist.github.com/gboudreau/94bb0c11a6209c82418d01a59d958c93) for the hardware context.
