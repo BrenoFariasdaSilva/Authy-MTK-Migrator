@@ -86,3 +86,27 @@ The hardware-dependent workflow is experimental. Merely having a MediaTek chipse
    git clone https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator.git
    cd Authy-MTK-Migrator
    ```
+
+## Installation:
+
+* Python 3.11+ (after the standalone implementation files have been added to this repository):
+
+  * Manually:
+      ```bash
+      python3 -m venv .venv
+      source .venv/bin/activate
+      python -m pip install -r requirements.txt
+      ```
+
+  * Using Makefile:
+      ```bash
+      make setup
+      ```
+
+  * Using ShellScript (macOS with Homebrew; prepares Python and MTKClient):
+      ```bash
+      bash scripts/setup_macos.sh
+      source .venv/bin/activate
+      ```  
+
+  The prototype's setup script checks for prerequisites and installs MTKClient in a separate virtual environment. No setup script is necessary for converting an already-extracted supported file once Python dependencies are installed. **The `Makefile` and setup script are not yet available in the current GitHub checkout.**
