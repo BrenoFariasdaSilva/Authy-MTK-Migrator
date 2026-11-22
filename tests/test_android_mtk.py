@@ -31,6 +31,11 @@ class ParserTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
 
+    def make_xml(self, rows, filename="com.authy.storage.tokens.authenticator.xml", key="com.authy.storage.tokens.authenticator.key"):
+        p = self.root / filename
+        p.write_text(xml_doc(rows, key), encoding="utf-8")
+        return p
+
 
 if __name__ == "__main__":
     unittest.main()
