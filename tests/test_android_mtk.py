@@ -70,6 +70,12 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(tokens[0].secret, SEED)
         self.assertEqual(len(load_authy_xml(p, "wrong")[1]), 1)
 
+    def test_malformed_xml_rejected(self):
+        p = self.root / "invalid.xml"
+        p.write_text("<!DOCTYPE map [<!ENTITY x 'x'>]><map>&x;</map>")
+        with self.assertRaises(MigrationError):
+            load_authy_xml(p)
+
 
 if __name__ == "__main__":
     unittest.main()
