@@ -27,3 +27,17 @@ def to_uri(token: Token) -> str:
     else:
         query["period"] = str(token.period)
     return f"otpauth://{token.kind}/{label}?{urlencode(query)}"
+
+
+def aegis_document(tokens: list[Token]) -> dict:
+    entries = []
+    for token in tokens:
+        info = {"secret": token.secret, "algo": token.algorithm, "digits": token.digits}
+        info["period" if token.kind == "totp" else "counter"] = (
+            token.period if token.kind == "totp" else token.counter
+        )
+        entries.append({"type": token.kind, "uuid": str(uuid.uuid4()),
+                        "name": token.name, "issuer": token.issuer, "icon": None,
+                        "info": info})
+    return {"version": 1, "header": {"slots": None, "params": None},
+            "db": {"version": 3, "entries": entries, "groups": []}}
