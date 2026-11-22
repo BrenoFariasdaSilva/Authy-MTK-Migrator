@@ -219,5 +219,24 @@ pathlib.Path(sys.argv[3]).write_bytes(b'0' * 4096)
         self.assertEqual(load_authy_xml(files[0])[1], [])
 
 
+# Additional secure archive tests (unittest discovery accepts separately declared classes).
+class BackupTests(unittest.TestCase):
+    def test_encrypt_restore_and_wrong_password(self):
+        from android_mtk.secure_backup import create_backup, restore_backup
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "exports"
+            source.mkdir()
+            (source / "otpauth.txt").write_text("otpauth://totp/Test?secret=" + SEED)
+            out = root / "secrets.amtk"
+            create_backup([source / "otpauth.txt"], source, out, "a long test password")
+            self.assertNotIn(SEED.encode(), out.read_bytes())
+            with self.assertRaises(MigrationError):
+                restore_backup(out, root / "wrong", "wrong long password")
+            restored = restore_backup(out, root / "restored", "a long test password")
+            self.assertEqual(len(restored), 1)
+            self.assertEqual(restored[0].read_text(), (source / "otpauth.txt").read_text())
+
+
 if __name__ == "__main__":
     unittest.main()
