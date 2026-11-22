@@ -173,3 +173,63 @@ def parse_uri(uri: str) -> Token:
                      counter=int(field("counter", "0")))
     except (ValueError, TypeError) as exc:
         raise MigrationError("Invalid OTP URI numeric field") from exc
+
+
+def load_json(path: Path, fmt: str) -> tuple[list[Token], list[str]]:
+    try:
+        doc = json.loads(_read(path).decode("utf-8-sig"))
+    except (ValueError, UnicodeError) as exc:
+        raise MigrationError("JSON file is invalid") from exc
+    if not isinstance(doc, dict):
+        raise MigrationError("JSON document must be an object")
+    if fmt == "auto":
+        if "decrypted_authenticator_tokens" in doc:
+            fmt = "ios-json"
+        elif "db" in doc and "header" in doc:
+            fmt = "aegis"
+        elif "entries" in doc and "version" in doc:
+            fmt = "proton"
+        elif "URIs" in doc:
+            fmt = "uris-json"
+        else:
+            raise MigrationError("Unknown JSON schema: select a supported --source")
+    if fmt == "aegis":
+        if not isinstance(doc.get("db"), dict):
+            raise MigrationError("Encrypted Aegis vaults are not supported; export an unencrypted vault locally")
+        records = doc["db"].get("entries", [])
+    elif fmt == "proton":
+        records = doc.get("entries", [])
+    elif fmt == "ios-json":
+        records = doc.get("decrypted_authenticator_tokens", [])
+    elif fmt == "uris-json":
+        records = doc.get("URIs", [])
+    else:
+        raise MigrationError("Unknown JSON source")
+    if not isinstance(records, list):
+        raise MigrationError("Expected JSON entries list")
+    tokens, errors = [], []
+    for index, row in enumerate(records, start=1):
+        try:
+            if not isinstance(row, dict):
+                raise MigrationError("Entry must be an object")
+            if fmt == "aegis":
+                if row.get("type") not in {"totp", "hotp"}:
+                    raise MigrationError("Aegis token type unsupported")
+                info = row.get("info", {})
+                if not isinstance(info, dict):
+                    raise MigrationError("Aegis entry has invalid info")
+                tokens.append(Token(name=row.get("name", ""), issuer=row.get("issuer", ""),
+                                    secret=info.get("secret", ""), digits=info.get("digits", 6),
+                                    period=info.get("period", 30), algorithm=info.get("algo", "SHA1"),
+                                    kind=row["type"], counter=info.get("counter", 0)))
+            elif fmt == "proton":
+                tokens.append(parse_uri(row["content"]["uri"]))
+            elif fmt == "ios-json":
+                tokens.append(Token(name=row.get("name", ""), issuer=row.get("issuer", ""),
+                                    secret=row.get("decrypted_seed", ""), digits=int(row.get("digits", 6)),
+                                    period=int(row.get("period", 30)), algorithm=row.get("algorithm", "SHA1")))
+            else:
+                tokens.append(parse_uri(row["uri"]))
+        except (MigrationError, ValueError, TypeError, KeyError) as exc:
+            errors.append(f"Entry #{index}: invalid or unsupported token metadata")
+    return unique_tokens(tokens), errors
