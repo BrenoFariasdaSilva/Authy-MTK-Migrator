@@ -233,3 +233,27 @@ def load_json(path: Path, fmt: str) -> tuple[list[Token], list[str]]:
         except (MigrationError, ValueError, TypeError, KeyError) as exc:
             errors.append(f"Entry #{index}: invalid or unsupported token metadata")
     return unique_tokens(tokens), errors
+
+
+def load_tokens(path: Path, source: str = "auto", password: str | None = None) -> tuple[list[Token], list[str]]:
+    if path.is_dir():
+        files = [path / filename for filename in AUTHY_FILES if (path / filename).is_file()]
+        if not files:
+            files = [item for filename in AUTHY_FILES for item in path.rglob(filename)]
+        if not files:
+            raise MigrationError("No Authy XML files found under directory")
+        tokens: list[Token] = []
+        errors: list[str] = []
+        for file in sorted(set(files)):
+            found, problems = load_authy_xml(file, password)
+            tokens += found
+            errors += [f"{file.name}: {message}" for message in problems]
+        return unique_tokens(tokens), errors
+    if source == "auto":
+        source = "xml" if path.suffix.lower() == ".xml" else (
+            "uris" if path.suffix.lower() in {".txt", ".uri"} else "json")
+    if source == "xml":
+        return load_authy_xml(path, password)
+    if source == "uris":
+        return load_uris(path)
+    return load_json(path, "auto" if source == "json" else source)
