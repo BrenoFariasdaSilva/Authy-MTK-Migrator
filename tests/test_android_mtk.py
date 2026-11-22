@@ -36,6 +36,13 @@ class ParserTests(unittest.TestCase):
         p.write_text(xml_doc(rows, key), encoding="utf-8")
         return p
 
+    def test_authenticator_ordinary(self):
+        p = self.make_xml([{"name": "GitHub - alice", "originalIssuer": "GitHub",
+                            "decryptedSecret": SEED, "digits": 6, "accountType": "github"}])
+        tokens, errors = load_authy_xml(p)
+        self.assertEqual(errors, [])
+        self.assertEqual((tokens[0].issuer, tokens[0].name, tokens[0].period), ("GitHub", "alice", 30))
+
 
 if __name__ == "__main__":
     unittest.main()
