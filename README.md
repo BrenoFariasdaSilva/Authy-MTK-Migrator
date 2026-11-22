@@ -135,14 +135,14 @@ Discuss the results obtained in the project.
 
 ## How to Cite?
 
-If you use the Repository-Name in your research, please cite it using the following BibTeX entry:
+If you use the Authy-MTK-Migrator in your research, please cite it using the following BibTeX entry:
 
 ```
-@misc{softwareRepository-Name:2024,
-  title = {Repository-Name: Project-Description},
+@misc{softwareAuthy-MTK-Migrator:2024,
+  title = {Authy-MTK-Migrator: Project-Description},
   author = {Breno Farias da Silva},
   year = {2024},
-  howpublished = {https://github.com/BrenoFariasdaSilva/Repository-Name},
+  howpublished = {https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator},
   note = {Accessed on September 11, 2024}
 }
 ```
