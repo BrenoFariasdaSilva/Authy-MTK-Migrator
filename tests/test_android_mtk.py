@@ -199,6 +199,25 @@ pathlib.Path(sys.argv[3]).write_bytes(b'0' * 4096)
         python_path = os.path.relpath(sys.executable, Path.cwd())
         self.assertEqual(dump_userdata(mtk, image, python_path), image)
 
+    def test_extract_fake_debugfs(self):
+        # Mock the debugfs boundary; real ext4 and device support require hardware testing.
+        data = bytearray(2048)
+        data[1080:1082] = b"\x53\xef"
+        image = self.root / "userdata.img"
+        image.write_bytes(data)
+        output = self.root / "extracted"
+        source = xml_doc([{"name": "Example", "decryptedSecret": SEED}])
+        def fake_run(cmd, **kwargs):
+            command = cmd[2]
+            if command.split(" ")[1].endswith("authenticator.xml"):
+                Path(command.split(" ")[-1]).write_text(source)
+            return type("Result", (), {"returncode": 0})()
+        with patch("android_mtk.device._find_debugfs", return_value="/usr/bin/debugfs"):
+            with patch("android_mtk.device.subprocess.run", side_effect=fake_run):
+                files = extract_authy_xml(image, output)
+        self.assertEqual(len(files), 1)
+        self.assertEqual(load_authy_xml(files[0])[1], [])
+
 
 if __name__ == "__main__":
     unittest.main()
