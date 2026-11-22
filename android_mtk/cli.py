@@ -101,3 +101,23 @@ def _doctor() -> None:
             print(f"{module}: not found")
     mtk = Path(__file__).resolve().parents[1] / ".tools/mtkclient/mtk.py"
     print(f"MTKClient: {'found' if mtk.exists() else 'not installed'}")
+
+
+def _load(path: Path, source: str, allow_partial: bool):
+    tokens, errors = load_tokens(path, source)
+    if any("Encrypted entries found" in error for error in errors):
+        password = getpass("Authy BACKUP password (hidden; not the app-lock PIN): ")
+        tokens, errors = load_tokens(path, source, password)
+    if errors:
+        print(f"Skipped/failed entries: {len(errors)}", file=sys.stderr)
+        # Only benign, fixed error explanations, never secret values.
+        for item in errors[:25]:
+            print(f"  {item}", file=sys.stderr)
+        if len(errors) > 25:
+            print(f"  ... and {len(errors) - 25} more", file=sys.stderr)
+        if not allow_partial:
+            raise MigrationError("One or more tokens failed. Refusing partial export; use --allow-partial only after reviewing errors")
+    if not tokens:
+        raise MigrationError("No valid tokens were found")
+    print(f"Loaded {len(tokens)} unique token(s). No secrets displayed.")
+    return tokens
