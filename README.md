@@ -159,3 +159,13 @@ python -m android_mtk recover \
 Connect the powered-off device in its **device-specific** BROM/preloader mode when prompted by MTKClient; the key combination is not universal. Other prototype commands include `dump`, `extract`, `verify`, `backup`, and `restore-backup`. The `recover` command does not overwrite raw device images or modify device partitions, and the export step does not import tokens into another app automatically.
 
 **Security:** `userdata.img`, extracted XML, export JSON, OTP URIs, and QR codes may contain live 2FA credentials. Store them locally with restricted access, never publish them, and **verify every account in the destination app before removing Authy**. Authy-specific 7-digit codes with 10-second periods may not work in all other apps. See the [original November 2026 method](https://gist.github.com/gboudreau/94bb0c11a6209c82418d01a59d958c93) for the hardware context.
+
+## Results - Optional
+
+The separate standalone Python prototype passed **20/20 synthetic unit tests**, covering token parsing, supported Authy decryption, OTP properties, export formats, encrypted backups, and mocked read-only MediaTek command execution. Run the tests after the prototype source files have been added:
+
+```bash
+python -m unittest discover -s tests -p test_android_mtk.py -v
+```
+
+**Limitations:** No physical MediaTek device was used in these tests, and no successful import inside Aegis, Proton Authenticator, or other destination apps was independently verified. The reported **MT8321 / Android 7.0** recovery was performed by the [original gist author](https://gist.github.com/gboudreau/94bb0c11a6209c82418d01a59d958c93), not by this project's prototype tests.
