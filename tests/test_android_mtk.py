@@ -131,6 +131,19 @@ class ParserTests(unittest.TestCase):
             write_exports(tokens, dest, {"uris"})
         write_exports(tokens, dest, {"uris"}, force=True)
 
+    def test_no_symlink_overwrite(self):
+        target = self.root / "private"
+        target.write_text("important")
+        dest = self.root / "exports"
+        dest.mkdir()
+        try:
+            (dest / "aegis.json").symlink_to(target)
+        except (OSError, NotImplementedError):
+            self.skipTest("Symlinks unavailable")
+        with self.assertRaises(MigrationError):
+            write_exports([Token(name="a", issuer="b", secret=SEED)], dest, {"aegis"}, force=True)
+        self.assertEqual(target.read_text(), "important")
+
 
 if __name__ == "__main__":
     unittest.main()
