@@ -25,5 +25,12 @@ def xml_doc(records, key="com.authy.storage.tokens.authenticator.key"):
     return f'<map><string name="{key}">{escape(json.dumps(records))}</string></map>'
 
 
+class ParserTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+
+
 if __name__ == "__main__":
     unittest.main()
