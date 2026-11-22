@@ -20,5 +20,10 @@ from android_mtk.parsers import load_authy_xml, load_json, load_tokens, load_uri
 SEED = "JBSWY3DPEHPK3PXP"  # Public, well-known synthetic example; NOT a real account.
 
 
+def xml_doc(records, key="com.authy.storage.tokens.authenticator.key"):
+    from xml.sax.saxutils import escape
+    return f'<map><string name="{key}">{escape(json.dumps(records))}</string></map>'
+
+
 if __name__ == "__main__":
     unittest.main()
