@@ -108,6 +108,12 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(len(tokens), 2)
         self.assertEqual(errors, [])
 
+    def test_rfc6238_vector(self):
+        # RFC 6238 8-digit SHA1 test vector, T=59 seconds.
+        raw = b"12345678901234567890"
+        t = Token(name="RFC", issuer="example", secret=base64.b32encode(raw).decode(), digits=8)
+        self.assertEqual(calculate_code(t, 59), "94287082")
+
 
 if __name__ == "__main__":
     unittest.main()
