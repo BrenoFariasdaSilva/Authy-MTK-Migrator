@@ -89,3 +89,37 @@ def _authy_record(record: dict, password: str | None) -> Token:
         raise MigrationError("Authy token has an invalid digits field") from exc
     return Token(name=name, issuer=issuer, secret=seed, digits=digits,
                  period=10 if own_token else 30)
+
+
+def load_authy_xml(path: Path, password: str | None = None) -> tuple[list[Token], list[str]]:
+    content = _read(path)
+    if b"<!DOCTYPE" in content.upper() or b"<!ENTITY" in content.upper():
+        raise MigrationError("XML document types and entities are not permitted")
+    try:
+        root = ET.fromstring(content)
+    except ET.ParseError as exc:
+        raise MigrationError("Authy XML cannot be parsed; filesystem may be encrypted or unsupported") from exc
+    if root.tag != "map":
+        raise MigrationError("Expected Android shared-preferences XML <map> root")
+    names = {"com.authy.storage.tokens.authenticator.key", "com.authy.storage.tokens.authy.key"}
+    arrays = [x.text for x in root if x.tag == "string" and x.attrib.get("name") in names]
+    if not arrays:
+        raise MigrationError("No supported Authy token array found in shared-preferences XML")
+    records: list[dict] = []
+    for raw in arrays:
+        try:
+            data = json.loads(raw or "")
+        except json.JSONDecodeError as exc:
+            raise MigrationError("Authy token array contains invalid JSON") from exc
+        if not isinstance(data, list):
+            raise MigrationError("Authy token array must be a JSON list")
+        if not all(isinstance(row, dict) for row in data):
+            raise MigrationError("Authy token array contains invalid entries")
+        records.extend(data)
+    tokens, errors = [], []
+    for index, entry in enumerate(records, start=1):
+        try:
+            tokens.append(_authy_record(entry, password))
+        except MigrationError as exc:
+            errors.append(f"Entry #{index}: {exc}")
+    return unique_tokens(tokens), errors
