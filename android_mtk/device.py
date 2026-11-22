@@ -52,3 +52,27 @@ def dump_userdata(mtk_dir: Path, image: Path, python_path: str | None = None) ->
     if proc.returncode or not image.is_file() or image.stat().st_size < 2048:
         raise MigrationError("MTKClient partition read failed or produced no image; any partial image must be reviewed and securely handled")
     return image
+
+
+def _find_debugfs(explicit: str | None) -> str:
+    if explicit:
+        if Path(explicit).is_file():
+            return explicit
+        found = shutil.which(explicit)
+        if found:
+            return found
+        raise MigrationError("Specified debugfs executable not found")
+    path = shutil.which("debugfs")
+    if path:
+        return path
+    for prefix in ("/opt/homebrew", "/usr/local"):
+        p = Path(prefix) / "opt/e2fsprogs/sbin/debugfs"
+        if p.is_file():
+            return str(p)
+    if shutil.which("brew"):
+        proc = subprocess.run(["brew", "--prefix", "e2fsprogs"], capture_output=True, text=True)
+        if proc.returncode == 0:
+            p = Path(proc.stdout.strip()) / "sbin/debugfs"
+            if p.is_file():
+                return str(p)
+    raise MigrationError("debugfs unavailable; install e2fsprogs (macOS: brew install e2fsprogs)")
