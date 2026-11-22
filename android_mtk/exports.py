@@ -11,3 +11,5 @@ from urllib.parse import quote, urlencode
 import uuid
 
 from .model import MigrationError, Token
+
+EXPORTS = {"uris", "aegis", "proton", "qr"}
