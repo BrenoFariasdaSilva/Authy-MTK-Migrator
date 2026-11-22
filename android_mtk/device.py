@@ -26,3 +26,29 @@ def _check_output(path: Path) -> None:
         raise MigrationError(f"Refusing to overwrite or follow existing destination: {path}")
     if not path.parent.is_dir() or path.parent.is_symlink():
         raise MigrationError(f"Destination parent is not a safe directory: {path.parent}")
+
+
+def dump_userdata(mtk_dir: Path, image: Path, python_path: str | None = None) -> Path:
+    """Invoke only `mtk.py r userdata <file>`; never write/erase/format partitions."""
+    script = mtk_dir.resolve() / "mtk.py"
+    if not script.is_file():
+        raise MigrationError("MTKClient mtk.py not found. Run scripts/setup_macos.sh or pass --mtk-dir")
+    image = image.absolute()
+    _check_output(image)
+    if python_path:
+        if Path(python_path).is_file():
+            interpreter = str(Path(python_path).absolute())
+        else:
+            interpreter = shutil.which(python_path)
+            if not interpreter:
+                raise MigrationError("MTKClient Python interpreter not found")
+    else:
+        interpreter = sys.executable
+    try:
+        proc = subprocess.run([interpreter, str(script), "r", "userdata", str(image)],
+                              cwd=str(mtk_dir.resolve()), check=False)
+    except OSError as exc:
+        raise MigrationError("Unable to launch MTKClient; check installation and USB access") from exc
+    if proc.returncode or not image.is_file() or image.stat().st_size < 2048:
+        raise MigrationError("MTKClient partition read failed or produced no image; any partial image must be reviewed and securely handled")
+    return image
