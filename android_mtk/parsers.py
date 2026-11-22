@@ -123,3 +123,20 @@ def load_authy_xml(path: Path, password: str | None = None) -> tuple[list[Token]
         except MigrationError as exc:
             errors.append(f"Entry #{index}: {exc}")
     return unique_tokens(tokens), errors
+
+
+def load_uris(path: Path) -> tuple[list[Token], list[str]]:
+    tokens, errors = [], []
+    try:
+        lines = _read(path).decode("utf-8-sig").splitlines()
+    except UnicodeDecodeError as exc:
+        raise MigrationError("URI input text must be valid UTF-8") from exc
+    for index, line in enumerate(lines, start=1):
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        try:
+            tokens.append(parse_uri(line))
+        except MigrationError as exc:
+            errors.append(f"Line {index}: {exc}")
+    return unique_tokens(tokens), errors
