@@ -36,3 +36,22 @@ class Token:
     algorithm: str = "SHA1"
     kind: str = "totp"
     counter: int = 0
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "name", self.name.strip() if isinstance(self.name, str) else "")
+        object.__setattr__(self, "issuer", self.issuer.strip() if isinstance(self.issuer, str) else "")
+        object.__setattr__(self, "secret", normalize_secret(self.secret))
+        object.__setattr__(self, "algorithm", self.algorithm.upper().replace("-", ""))
+        object.__setattr__(self, "kind", self.kind.lower())
+        if not (self.name or self.issuer):
+            raise MigrationError("OTP account has no name or issuer")
+        if self.kind not in {"totp", "hotp"}:
+            raise MigrationError("Unsupported OTP type")
+        if self.algorithm not in {"SHA1", "SHA256", "SHA512"}:
+            raise MigrationError("Unsupported OTP algorithm")
+        if type(self.digits) is not int or not 4 <= self.digits <= 10:
+            raise MigrationError("Unsupported OTP digit count")
+        if type(self.period) is not int or not 1 <= self.period <= 3600:
+            raise MigrationError("Unsupported OTP period")
+        if type(self.counter) is not int or self.counter < 0:
+            raise MigrationError("Invalid HOTP counter")
