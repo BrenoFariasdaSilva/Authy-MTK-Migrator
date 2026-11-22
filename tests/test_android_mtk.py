@@ -176,6 +176,19 @@ class ParserTests(unittest.TestCase):
         path.write_bytes(data)
         _require_ext4(path)
 
+    def test_read_only_mtkclient_invocation(self):
+        import sys
+        mtk = self.root / "mtkclient"
+        mtk.mkdir()
+        (mtk / "mtk.py").write_text("""import pathlib, sys
+assert sys.argv[1:3] == ['r', 'userdata']
+pathlib.Path(sys.argv[3]).write_bytes(b'0' * 4096)
+""")
+        image = self.root / "userdata.img"
+        self.assertEqual(dump_userdata(mtk, image, sys.executable), image)
+        with self.assertRaises(MigrationError):
+            dump_userdata(mtk, image, sys.executable)
+
 
 if __name__ == "__main__":
     unittest.main()
