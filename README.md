@@ -223,3 +223,20 @@ Please follow the guidelines below or read [CONTRIBUTING.md](CONTRIBUTING.md) fo
 4. **Stay Engaged:** Respond to review feedback and make any necessary adjustments.
 
 5. **Celebrate:** Once your pull request is merged, your contribution becomes part of the project!
+
+## Collaborators
+
+We thank the following people who contributed to this project:
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/BrenoFariasdaSilva" title="Breno Farias da Silva on GitHub">
+        <img src="https://github.com/BrenoFariasdaSilva.png" width="100px;" alt="My Profile Picture"/><br>
+        <sub>
+          <b>Breno Farias da Silva</b>
+        </sub>
+      </a>
+    </td>
+  </tr>
+</table>
