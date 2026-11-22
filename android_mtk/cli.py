@@ -15,3 +15,12 @@ from .model import MigrationError
 from .parsers import load_tokens
 from .otp import calculate_code
 from .secure_backup import create_backup, restore_backup
+
+
+def _formats(value: str) -> set[str]:
+    result = set(value.lower().replace(" ", "").split(","))
+    if "all" in result:
+        return set(EXPORTS)
+    if not result or not result <= EXPORTS:
+        raise argparse.ArgumentTypeError("Formats: all or comma-separated uris,aegis,proton,qr")
+    return result
