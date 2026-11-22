@@ -86,3 +86,46 @@ def _require_ext4(image: Path) -> None:
         magic = stream.read(2)
     if magic != b"\x53\xef":
         raise MigrationError("Userdata image is not recognized as an ext2/3/4 filesystem. Encrypted, sparse, F2FS, or unsupported filesystems cannot be processed by debugfs")
+
+
+def extract_authy_xml(image: Path, output: Path, debugfs: str | None = None) -> list[Path]:
+    """Dump ONLY the two Authy preferences files, never whole app data."""
+    _require_ext4(image)
+    binary = _find_debugfs(debugfs)
+    if output.is_symlink() or (output.exists() and not output.is_dir()):
+        raise MigrationError("Unsafe extraction output directory")
+    output.mkdir(mode=0o700, parents=True, exist_ok=True)
+    if os.name != "nt": os.chmod(output, 0o700)
+    files: list[Path] = []
+    # Temporary destination avoids quoting paths with spaces in debugfs -R.
+    with tempfile.TemporaryDirectory(prefix="authy-debugfs-") as temp:
+        for filename in AUTHY_FILES:
+            final = output / filename
+            _check_output(final)
+            for internal in ANDROID_LOCATIONS:
+                scratch = Path(temp) / filename
+                if scratch.exists(): scratch.unlink()
+                # temp path has no whitespace for normal macOS/Linux TMPDIR.
+                if any(x.isspace() for x in str(scratch)):
+                    raise MigrationError("Temporary path contains whitespace; configure TMPDIR without spaces")
+                command = f"dump {internal}/{filename} {scratch}"
+                run = subprocess.run([binary, "-R", command, str(image)],
+                                     capture_output=True, text=True, check=False)
+                if run.returncode == 0 and scratch.is_file() and scratch.stat().st_size:
+                    # Inspect XML structure before storing (encrypted fscrypt data fails).
+                    from .parsers import load_authy_xml
+                    try:
+                        # A valid but fully encrypted-token XML parses as zero tokens + warnings;
+                        # this is fine, actual password can be provided at export time.
+                        load_authy_xml(scratch)
+                    except MigrationError as exc:
+                        if "Encrypted entries found" not in str(exc):
+                            raise MigrationError(f"Recovered Authy XML cannot be parsed: {exc}") from exc
+                    fd = os.open(final, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                    with os.fdopen(fd, "wb") as dest:
+                        dest.write(scratch.read_bytes())
+                    files.append(final)
+                    break
+    if not files:
+        raise MigrationError("Authy XML not found in readable ext4 userdata; it may be encrypted, absent, or located on an unsupported filesystem")
+    return files
