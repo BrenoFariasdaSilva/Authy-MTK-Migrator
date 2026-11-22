@@ -68,3 +68,13 @@ def _parser() -> argparse.ArgumentParser:
     verify.add_argument("--index", type=int, required=True, help="1-based index in alphabetically sorted import")
     verify.add_argument("--show-code", action="store_true", help="Explicitly allow display of 2FA code")
     return main
+
+
+def _convert_args(p: argparse.ArgumentParser) -> None:
+    p.add_argument("--input", required=True, type=Path, help="Authy XML, directory containing XML, URI text, or JSON")
+    p.add_argument("--source", default="auto", choices=("auto", "xml", "uris", "json", "aegis", "proton", "ios-json", "uris-json"))
+    p.add_argument("--out", required=True, type=Path)
+    p.add_argument("--formats", type=_formats, default=set(EXPORTS))
+    p.add_argument("--acknowledge-secrets", action="store_true", help="Required to create plaintext sensitive exports")
+    p.add_argument("--allow-partial", action="store_true", help="Explicitly export valid tokens despite skipped entries")
+    p.add_argument("--force", action="store_true", help="Replace existing regular export files (not symlinks)")
