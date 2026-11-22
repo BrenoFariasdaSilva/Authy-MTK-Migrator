@@ -48,7 +48,6 @@ Offline recovery and migration of Authy two-factor authentication (2FA) tokens f
   - [Installation:](#installation)
   - [Run Programing Language Code:](#run-programing-language-code)
     - [Dependencies](#dependencies)
-    - [Dataset - Optional](#dataset---optional)
   - [Usage](#usage)
   - [Results](#results)
   - [How to Cite?](#how-to-cite)
@@ -128,10 +127,6 @@ python -m android_mtk --help
    ```
 
    The reference prototype pins `cryptography`, `Pillow`, and `qrcode`. Hardware acquisition also requires MTKClient and its separately managed dependencies.
-
-### Dataset - Optional
-
-1. **No dataset download is required.** The tool processes an existing Authy XML/JSON/URI file or, on compatible hardware, a locally extracted `userdata` image. No `make dataset` target exists in the prototype. The unit tests use synthetic token records; never publish real 2FA secrets as test fixtures.
 
 ## Usage
 
