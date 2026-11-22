@@ -88,3 +88,48 @@ def _save_bytes(path: Path, content: bytes, overwrite: bool) -> None:
 
 def _json(data: dict) -> bytes:
     return (json.dumps(data, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+
+
+def write_exports(tokens: list[Token], dest: Path, formats: set[str], *,
+                  force: bool = False) -> list[Path]:
+    if not tokens:
+        raise MigrationError("No valid OTP tokens available to export")
+    if not formats <= EXPORTS or not formats:
+        raise MigrationError("Unsupported export format")
+    _is_safe_dir(dest)
+    targets: list[tuple[Path, bytes]] = []
+    if "uris" in formats:
+        uri_items = [{"name": t.name or t.issuer, "uri": to_uri(t)} for t in tokens]
+        targets.extend([(dest / "otpauth.txt", ("\n".join(item["uri"] for item in uri_items) + "\n").encode()),
+                        (dest / "URIs.json", _json({"URIs": uri_items}))])
+    if "aegis" in formats:
+        targets.append((dest / "aegis.json", _json(aegis_document(tokens))))
+    if "proton" in formats:
+        targets.append((dest / "proton_authenticator.json", _json(proton_document(tokens))))
+    if "qr" in formats:
+        try:
+            import qrcode
+        except ImportError as exc:
+            raise MigrationError("QR export needs qrcode and Pillow (pip install -r requirements.txt)") from exc
+        qr_dir = dest / "qr_codes"
+        _is_safe_dir(qr_dir)
+        mapping = io.StringIO()
+        writer = csv.writer(mapping)
+        writer.writerow(["file", "issuer", "account", "type", "digits", "period", "algorithm"])
+        for index, token in enumerate(tokens, start=1):
+            # Sequence-only image filenames avoid exposing account names in paths.
+            filename = f"otp-{index:04d}.png"
+            image = qrcode.make(to_uri(token))
+            stream = io.BytesIO()
+            image.save(stream, format="PNG")
+            targets.append((qr_dir / filename, stream.getvalue()))
+            writer.writerow([filename, token.issuer, token.name, token.kind,
+                             token.digits, token.period if token.kind == "totp" else "", token.algorithm])
+        targets.append((qr_dir / "index.csv", mapping.getvalue().encode("utf-8")))
+    # Validate every destination before touching any output.
+    for path, _ in targets:
+        if path.is_symlink() or (path.exists() and (not force or not path.is_file())):
+            raise MigrationError(f"Output exists or is unsafe: {path}; use --force only for regular files")
+    for path, content in targets:
+        _save_bytes(path, content, force)
+    return [path for path, _ in targets]
