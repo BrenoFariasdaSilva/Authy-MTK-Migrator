@@ -32,7 +32,7 @@ Offline recovery and migration of Authy two-factor authentication (2FA) tokens f
 [![Closed Pull Requests](https://img.shields.io/github/issues-pr-closed/BrenoFariasdaSilva/Authy-MTK-Migrator)](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/pulls?q=is%3Apr+is%3Aclosed)
 [![Monthly Commits](https://img.shields.io/github/commit-activity/m/BrenoFariasdaSilva/Authy-MTK-Migrator/main)](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/commits)
 [![Merged PRs](https://img.shields.io/github/issues-search/BrenoFariasdaSilva/Authy-MTK-Migrator?query=is%3Apr%20is%3Amerged&label=merged%20PRs&color=blue)](https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator/pulls?q=is%3Apr+is%3Amerged)
-![Purpose](https://img.shields.io/badge/Purpose-Repository%20Template-6f42c1)
+![Purpose](https://img.shields.io/badge/Purpose-Authy%20Token%20Migration-6f42c1)
 ![Workflow](https://img.shields.io/badge/Workflow-Conventional%20Commits-227c4a)
 ![Repobeats Statistics](https://repobeats.axiom.co/api/embed/ac647e4939b05c18ec875dbf58df9306d1f697eb.svg)
 
