@@ -166,6 +166,16 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(len(tokens), 1)
         self.assertEqual(errors, [])
 
+    def test_ext4_signature(self):
+        path = self.root / "userdata.img"
+        data = bytearray(2048)
+        with path.open("wb") as f: f.write(data)
+        with self.assertRaises(MigrationError):
+            _require_ext4(path)
+        data[1024 + 0x38:1024 + 0x3a] = b"\x53\xef"
+        path.write_bytes(data)
+        _require_ext4(path)
+
 
 if __name__ == "__main__":
     unittest.main()
