@@ -30,3 +30,24 @@ def _key(password: str, salt: bytes) -> bytes:
                                               maxmem=128 * 1024 * 1024)
     except (ValueError, MemoryError) as exc:
         raise MigrationError("Insufficient memory for backup password derivation") from exc
+
+
+def create_backup(files: list[Path], root: Path, target: Path, password: str, force: bool = False) -> None:
+    if target.is_symlink() or (target.exists() and not force):
+        raise MigrationError("Encrypted backup already exists or is a symlink")
+    _is_safe_dir(target.parent)
+    buf = BytesIO()
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for source in files:
+            if not source.is_file() or source.is_symlink():
+                raise MigrationError("Backup includes unsafe input file")
+            rel = source.relative_to(root).as_posix()
+            archive.write(source, rel)
+            if buf.tell() > MAX_UNCOMPRESSED:
+                raise MigrationError("Too much data for encrypted backup")
+    payload = buf.getvalue()
+    if len(payload) > MAX_ENCRYPTED:
+        raise MigrationError("Encrypted backup too large")
+    salt, nonce = os.urandom(16), os.urandom(12)
+    ciphertext = AESGCM(_key(password, salt)).encrypt(nonce, payload, MAGIC)
+    _save_bytes(target, MAGIC + salt + nonce + ciphertext, force)
