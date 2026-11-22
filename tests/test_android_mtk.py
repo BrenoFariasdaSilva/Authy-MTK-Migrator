@@ -90,6 +90,10 @@ class ParserTests(unittest.TestCase):
         for token in tokens:
             self.assertEqual(parse_uri(to_uri(token)), token)
 
+    def test_parse_uri_conflicting_issuer_is_rejected(self):
+        with self.assertRaises(MigrationError):
+            parse_uri(f"otpauth://totp/Foo:alice?issuer=Bar&secret={SEED}")
+
 
 if __name__ == "__main__":
     unittest.main()
