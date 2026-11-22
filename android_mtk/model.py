@@ -55,3 +55,13 @@ class Token:
             raise MigrationError("Unsupported OTP period")
         if type(self.counter) is not int or self.counter < 0:
             raise MigrationError("Invalid HOTP counter")
+
+
+def unique_tokens(tokens: list[Token]) -> list[Token]:
+    seen: set[Token] = set()
+    result: list[Token] = []
+    for token in tokens:
+        if token not in seen:
+            seen.add(token)
+            result.append(token)
+    return sorted(result, key=lambda t: (t.issuer.casefold(), t.name.casefold(), t.kind, t.secret))
