@@ -64,3 +64,14 @@ Authy-MTK-Migrator is an offline Python toolkit for recovering Authy OTP secrets
 The toolkit also accepts compatible **already-extracted** Authy XML, decrypted JSON from [Authy-iOS-MiTM](https://github.com/BrenoFariasdaSilva/Authy-iOS-MiTM), and supported authenticator export files. These file-conversion features do **not** require a MediaTek device. The MediaTek-specific part is the automated device acquisition, which is **not** universal: modern encrypted Android devices, other chipsets, and unsupported firmware cannot be assumed to work. The tool cannot bypass Android encryption or access restrictions.
 
 **Repository status (November 2026):** The working standalone prototype and its tests were prepared separately, but the Python implementation has **not yet been committed to this repository**. Commands below describe that prototype and will work in this repository only after its source files, dependencies, and scripts are added. Hardware acquisition and actual imports into destination apps have not been validated on a physical device.
+
+## Requirements
+
+- **Python 3.11+** for the standalone converter, plus its Python dependencies (`cryptography`, `Pillow`, and `qrcode`).
+- **macOS or Linux** recommended for MediaTek acquisition, with Git, libusb, and a separately installed [MTKClient](https://github.com/bkerler/mtkclient). On macOS, Homebrew can install the required host tools.
+- **`e2fsprogs` / `debugfs`** to read a supported, unencrypted ext2/3/4 `userdata` image.
+- **An owned or explicitly authorized MediaTek device**, with accessible BROM/preloader, readable unencrypted `userdata`, and Authy previously signed in with the relevant tokens, **or** a compatible local XML/JSON/OTP URI file for file-only conversion.
+- **Enough free storage** for a complete `userdata` image if dumping a device, plus local export files.
+- **The Authy backup password**, if some records contain encrypted secrets; this is different from the Authy app-lock PIN.
+
+The hardware-dependent workflow is experimental. Merely having a MediaTek chipset does not guarantee that USB acquisition, filesystem extraction, or token recovery will succeed.
