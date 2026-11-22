@@ -41,3 +41,11 @@ def aegis_document(tokens: list[Token]) -> dict:
                         "info": info})
     return {"version": 1, "header": {"slots": None, "params": None},
             "db": {"version": 3, "entries": entries, "groups": []}}
+
+
+def proton_document(tokens: list[Token]) -> dict:
+    return {"version": 1, "entries": [
+        {"id": str(uuid.uuid4()), "content": {"uri": to_uri(t), "entry_type":
+            "Hotp" if t.kind == "hotp" else "Totp", "name": t.name or t.issuer},
+         "note": None} for t in tokens
+    ]}
