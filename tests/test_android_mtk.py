@@ -100,6 +100,14 @@ class ParserTests(unittest.TestCase):
                 with self.assertRaises(MigrationError):
                     normalize_secret(value)
 
+    def test_multi_xml_directory(self):
+        self.make_xml([{"name": "GitHub - alice", "decryptedSecret": SEED, "digits": 6}])
+        self.make_xml([{"name": "Authy", "secretSeed": "4142434445", "digits": 7}],
+                      "com.authy.storage.tokens.authy.xml", "com.authy.storage.tokens.authy.key")
+        tokens, errors = load_tokens(self.root)
+        self.assertEqual(len(tokens), 2)
+        self.assertEqual(errors, [])
+
 
 if __name__ == "__main__":
     unittest.main()
