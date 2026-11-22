@@ -207,6 +207,7 @@ Magnet\ Links\ from\ URL/*.csv
 class_block_functions_committer.py
 functions_committer.py
 readme_sections_committer.py
+incremental_python_committer.py
 
 # Never version raw phone partitions, authentication secrets, or exports.
 *.img
