@@ -169,3 +169,23 @@ python -m unittest discover -s tests -p test_android_mtk.py -v
 ```
 
 **Limitations:** No physical MediaTek device was used in these tests, and no successful import inside Aegis, Proton Authenticator, or other destination apps was independently verified. The reported **MT8321 / Android 7.0** recovery was performed by the [original gist author](https://gist.github.com/gboudreau/94bb0c11a6209c82418d01a59d958c93), not by this project's prototype tests.
+
+## How to Cite?
+
+If you use the Authy-MTK-Migrator in your research, please cite it using the following BibTeX entry:
+
+```
+@misc{softwareAuthy-MTK-Migrator:2026,
+  title = {Authy-MTK-Migrator: Automated offline Authy token recovery from legacy MediaTek Android devices, with exports to Aegis, Proton Authenticator, OTP URIs, and QR codes.},
+  author = {Breno Farias da Silva},
+  year = {2026},
+  howpublished = {https://github.com/BrenoFariasdaSilva/Authy-MTK-Migrator},
+  note = {Accessed on November 22, 2026}
+}
+```
+
+Additionally, a `main.bib` file is available in the root directory of this repository, in which contains the BibTeX entry for this project.
+
+If you find this repository valuable, please don't forget to give it a ⭐ to show your support! Contributions are highly encouraged, whether by creating issues for feedback or submitting pull requests (PRs) to improve the project. For details on how to contribute, please refer to the [Contributing](#contributing) section below.
+
+Thank you for your support and for recognizing the contribution of this tool to your work!
