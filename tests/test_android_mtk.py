@@ -18,3 +18,7 @@ from android_mtk.otp import calculate_code
 from android_mtk.parsers import load_authy_xml, load_json, load_tokens, load_uris, parse_uri
 
 SEED = "JBSWY3DPEHPK3PXP"  # Public, well-known synthetic example; NOT a real account.
+
+
+if __name__ == "__main__":
+    unittest.main()
