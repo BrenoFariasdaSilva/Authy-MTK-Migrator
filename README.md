@@ -8,7 +8,7 @@
   
 ---
 
-Project-Description.
+Offline recovery and migration of Authy two-factor authentication (2FA) tokens from compatible legacy MediaTek Android devices, with exports to Aegis, Proton Authenticator, `otpauth://` URIs, and QR codes.
   
 ---
 
