@@ -189,3 +189,37 @@ Additionally, a `main.bib` file is available in the root directory of this repos
 If you find this repository valuable, please don't forget to give it a ⭐ to show your support! Contributions are highly encouraged, whether by creating issues for feedback or submitting pull requests (PRs) to improve the project. For details on how to contribute, please refer to the [Contributing](#contributing) section below.
 
 Thank you for your support and for recognizing the contribution of this tool to your work!
+
+## Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+Please follow the guidelines below or read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions.
+
+1. **Set Up Your Environment:** Follow the [Setup](#setup) instructions.
+
+2. **Make Your Changes:**
+   - **Create a Branch:** `git checkout -b feature/YourFeatureName`
+   - **Implement and Test:** Ensure your changes work correctly.
+   - **Commit Your Changes:** Follow the [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) specification:
+
+     ```text
+     <type>[optional scope][!]: <description>
+     ```
+
+     Examples:
+     - Features: `git commit -m "feat(export): add authenticator export format"`
+     - Bug fixes: `git commit -m "fix(parser): reject malformed Authy token entries"`
+     - Documentation: `git commit -m "docs(readme): update installation instructions"`
+     - Refactoring: `git commit -m "refactor(recovery): separate device and file workflows"`
+     - Tests: `git commit -m "test(tokens): add OTP parsing test cases"`
+
+     Use `!` or a `BREAKING CHANGE:` footer to indicate breaking changes. See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete rules.
+
+3. **Submit Your Contribution:**
+   - Push your branch: `git push origin feature/YourFeatureName`
+   - Open a pull request describing your changes and relevant tests.
+
+4. **Stay Engaged:** Respond to review feedback and make any necessary adjustments.
+
+5. **Celebrate:** Once your pull request is merged, your contribution becomes part of the project!
