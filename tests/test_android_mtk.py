@@ -144,6 +144,19 @@ class ParserTests(unittest.TestCase):
             write_exports([Token(name="a", issuer="b", secret=SEED)], dest, {"aegis"}, force=True)
         self.assertEqual(target.read_text(), "important")
 
+    def test_cli_fail_closed_on_partial(self):
+        p = self.make_xml([{"name": "good", "decryptedSecret": SEED},
+                           {"name": "bad", "decryptedSecret": "!"}])
+        out = self.root / "result"
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(main(["convert", "--input", str(p), "--out", str(out),
+                                   "--acknowledge-secrets", "--formats", "aegis"]), 1)
+        self.assertFalse((out / "aegis.json").exists())
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(main(["convert", "--input", str(p), "--out", str(out),
+                                   "--acknowledge-secrets", "--allow-partial", "--formats", "aegis"]), 0)
+        self.assertTrue((out / "aegis.json").is_file())
+
 
 if __name__ == "__main__":
     unittest.main()
